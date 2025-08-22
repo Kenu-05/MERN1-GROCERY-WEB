@@ -1,6 +1,9 @@
 import { createContext,useContext,useEffect,useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { dummyProducts } from "../assets/assets";
+import { toast } from 'react-hot-toast';
+
+
 
 export const AppContext = createContext();
 
@@ -22,8 +25,8 @@ const fetchProducts=async ()=>{
 }
 
 //Add product to cart
-const addToCart=()=>{
-  let cartData=structureClone(cartItems);
+const addToCart=(itemId)=>{
+  let cartData=structuredClone(cartItems);
   if (cartData[itemId]){
     cartData[itemId]+=1;
   }else{
@@ -35,7 +38,7 @@ const addToCart=()=>{
 }
 //update cart Item quantity
 const updateCartItem=(itemId,quantity)=>{
-  let cartData=structureClone(cartItems);
+  let cartData=structuredClone(cartItems);
   cartData[itemId]=quantity;
   setCartItems(cartData)
   toast.success("cart Updated")

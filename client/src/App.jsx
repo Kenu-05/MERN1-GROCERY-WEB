@@ -3,7 +3,13 @@ import Navbar from './components/Navbar'
 import { useLocation } from 'react-router-dom'
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import {Toaster} from "react-hot-toast"
+import { toast } from 'react-toastify';
+import { Toaster } from 'react-hot-toast';
+import Footer from './components/Footer';
+
+
+
+
 
 
 
@@ -16,11 +22,12 @@ const App= () => {
       <Toaster />
 
        <div className={`${isSellerPath ? "" : "px-6 md:px-16 lg:px-24 xl:px-32"}` }>
-     <Routes>
-       <Route path='/' element={<Home/>} />
+         <Routes>
+           <Route path='/' element={<Home/>} />
        
-     </Routes>
-</div>
+         </Routes>
+       </div>
+       {!isSellerPath &&<  Footer/>}
 
     </div>
   )
