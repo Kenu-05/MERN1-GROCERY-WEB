@@ -53,8 +53,8 @@ const removeFromCart = (itemId)=>{
           delete cartData[itemId];
        }
 
-toast. success("Removed from Cart")
-setCartItems(cartData)
+   toast.success("Removed from Cart")
+   setCartItems(cartData)
 }
 }
    // Get Cart Item Count
