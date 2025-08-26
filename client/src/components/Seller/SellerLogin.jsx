@@ -1,6 +1,8 @@
 import React from 'react'
 import { useState,useEffect } from "react";
 import { useAppContext } from "../../context/AppContext";
+import { AppContext } from "../../context/AppContext"; 
+
 
 
 const SellerLogin = () => {
