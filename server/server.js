@@ -8,6 +8,7 @@ import sellerRouter from './routes/sellerRoute.js';
 import connectCloudinary from './configs/cloudinary.js';
 import productRouter from './routes/productRoute.js';
 import cartRouter from './routes/cartRoute.js';
+import addressRouter from './routes/adressRoute.js';
 
 
 
@@ -31,6 +32,7 @@ app.use('/api/user',userRouter);
 app.use('/api/seller',sellerRouter);
 app.use('/api/product',productRouter);
 app.use('/api/cart',cartRouter);
+app.use('/api/address',addressRouter);
 
 
 
