@@ -2,14 +2,14 @@
 
 
 import { v2 as cloudinary } from "cloudinary"
-import Product from "../models/Product"
+import Product from "../models/Product.js"
 
 // Add Product : /api/product/add
     export const addProduct = async (req, res)=>{
       try {
-         let productData = JSON.parse(req.body. productData)
+         let productData = JSON.parse(req.body.productData)
 
-         const images = req. files
+         const images = req.files
 
          let imagesUrl = await Promise.all(
          images.map(async (item)=>{
@@ -17,8 +17,8 @@ import Product from "../models/Product"
                 return result.secure_url
             })
         )
-        await Product.create({...productData,Image:imagesUrl})
-        res.json({success:true,message:"error.message"})
+        await Product.create({...productData,image:imagesUrl})
+        res.json({success:true,message:"product added successfully"})
 
       }catch(error){
           console.log(error.message);
