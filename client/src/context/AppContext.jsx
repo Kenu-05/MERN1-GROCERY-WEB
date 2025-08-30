@@ -2,22 +2,40 @@ import { createContext,useContext,useEffect,useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { dummyProducts } from "../assets/assets";
 import { toast } from 'react-hot-toast';
+import axios from "axios";
 
-
+axios.defaults.withCredentials=true;
+axios.defaults.baseURL=import.meta.env.VITE_BACKEND_URL;
 
 export const AppContext = createContext();
 
-export const AppContextProvider = ({children})=>{
+ export const AppContextProvider = ({children})=>{
 
 const currency=import.meta.env.VITE_CURRENCY;
 
 const navigate = useNavigate();
 const [user, setUser] = useState(true)
-const [isSeller, setIsSeller] = useState(false)
+const [isSeller, setIsSeller] = useState(null)
 const [showUserLogin, setShowUserLogin] = useState(false)
 const [products, setProducts] = useState([])
 const [cartItems,setCartItems]=useState({})
 const [searchQuery,setSearchQuery]=useState({})
+
+// Fetch Seller Status
+   const fetchSeller = async ()=>{
+         try {
+           const {data} = await axios.get('/api/seller/is-auth');
+           if(data.success){
+              setIsSeller(true)
+           }else{
+              setIsSeller(false)
+           }
+          } catch (error) {
+              setIsSeller(false)
+          }
+        }
+
+
 
 
 //fetch all products
@@ -78,9 +96,12 @@ const removeFromCart = (itemId)=>{
        return Math.floor(totalAmount * 100) / 100;
     }
     
-  useEffect(()=>{fetchProducts()},[])
+  useEffect(()=>{
+    fetchProducts()
+    fetchSeller()
+  },[])
 
-  const value = {navigate, user, setUser, setIsSeller, isSeller,showUserLogin,setShowUserLogin,products,currency,addToCart,updateCartItem,removeFromCart,cartItems,searchQuery,setSearchQuery,getCartAmount,getCartCount}
+  const value = {navigate, user, setUser, setIsSeller, isSeller,showUserLogin,setShowUserLogin,products,currency,addToCart,updateCartItem,removeFromCart,cartItems,searchQuery,setSearchQuery,getCartAmount,getCartCount,axios}
 
   return <AppContext.Provider value={value}>
        {children}
@@ -91,3 +112,5 @@ export const useAppContext = ()=>{
 return useContext(AppContext)
 
 }
+// bottom of fileல சேர்க்க
+export default AppContext;

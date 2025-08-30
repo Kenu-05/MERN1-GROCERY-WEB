@@ -1,5 +1,5 @@
 import Product from "../models/Product.js";
-import Order from "../models/Order";
+import Order from "../models/Order.js";
 
 // Place Order COD : /api/order/cod
 export const placeOrderCOD = async (req, res)=>{
