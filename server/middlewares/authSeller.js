@@ -1,4 +1,7 @@
 import jwt from 'jsonwebtoken';
+import cookieParser from "cookie-parser";
+
+
 
 
 const authSeller = async (req, res, next) =>{
@@ -9,10 +12,10 @@ const authSeller = async (req, res, next) =>{
       }
 
       try {
-              //  console.log("Cookies received:", req.cookies);
+               console.log("Cookies received:", req.cookies);
                const tokenDecode = jwt.verify(sellerToken, process.env.JWT_SECRET)
                
-               if(tokenDecode.email===process.env.SELLR_EMAIL){
+               if(tokenDecode.email===process.env.SELLER_EMAIL){
                    next();
       
                }else{

@@ -5,11 +5,10 @@ import jwt from 'jsonwebtoken';
 export const sellerLogin = async (req, res) =>{
     try{const { email, password } = req.body;
 
-         if(password === process.env. SELLER_PASSWORD && email === process.env.
-         SELLER_EMAIL){
-            const token = jwt. sign({email}, process.env. JWT_SECRET, {expiresIn: '7d'});
+         if(password === process.env.SELLER_PASSWORD && email === process.env.SELLER_EMAIL){
+            const token = jwt.sign({email}, process.env.JWT_SECRET, {expiresIn: '7d'});
 
-             res. cookie('sellerToken', token, {
+             res.cookie('sellerToken', token, {
                   httpOnly: true,
                   secure: process. env. NODE_ENV === 'production',
                   sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
@@ -31,10 +30,10 @@ export const sellerLogin = async (req, res) =>{
         export const isSellerAuth = async (req, res)=>{
              
            try {
-             
-              return res.json({success:true})
+                return res.json({ success: true, message: "Authorized" });
+       }
               
-            } 
+            
             catch (error) {
                 console.log(error.error);
                 res.json({ success: false, message: error.message });

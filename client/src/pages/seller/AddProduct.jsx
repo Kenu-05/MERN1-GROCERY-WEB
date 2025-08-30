@@ -2,6 +2,8 @@ import React from 'react'
 import { assets, categories } from '../../assets/assets';
 import { useState } from "react";
 import { useAppContext } from '../../context/AppContext';
+import { toast } from "react-hot-toast";
+
 
 const AddProduct = () => {
 
@@ -32,7 +34,7 @@ const AddProduct = () => {
                      formData.append('images', files[i])
                     }
 
-                    const {data} = await axios.post('/api/product/add', formData)
+                    const {data} = await axios.post('/api/product/add', formData,{ withCredentials: true } )
 
                 if (data.success){
                    toast.success(data.message);
