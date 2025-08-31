@@ -15,12 +15,13 @@ import jwt from "jsonwebtoken";
          if(tokenDecode.id){
             //  req.body.userId = tokenDecode.id;
             req.user = { userId: tokenDecode.id };
+            // exicute the controller
+            next();
 
          }else{
            return res.json({ success: false, message: 'Not Authorized' });
          }
-        // exicute the controller
-          next();
+        
        } 
       catch (error) {
          res.json({success:false,message:error.message})

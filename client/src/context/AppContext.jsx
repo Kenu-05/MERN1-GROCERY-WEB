@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { dummyProducts } from "../assets/assets";
 import { toast } from 'react-hot-toast';
 import axios from "axios";
+// import { updateCart } from "../../../server/controllers/cartController";
 
 axios.defaults.withCredentials=true;
 axios.defaults.baseURL=import.meta.env.VITE_BACKEND_URL;
@@ -14,7 +15,7 @@ export const AppContext = createContext();
 const currency=import.meta.env.VITE_CURRENCY;
 
 const navigate = useNavigate();
-const [user, setUser] = useState(true)
+const [user,setUser] = useState(null)
 const [isSeller, setIsSeller] = useState(null)
 const [showUserLogin, setShowUserLogin] = useState(false)
 const [products, setProducts] = useState([])
@@ -24,7 +25,7 @@ const [searchQuery,setSearchQuery]=useState({})
 // Fetch User Auth Status , User Data and Cart Items
      const fetchUser = async ()=>{
          try {
-           const {data} = await axios.get('api/user/is-auth');
+           const {data} = await axios.get('/api/user/is-auth');
            if (data.success){
              setUser(data.user)
              setCartItems(data.user.cartItems)
@@ -134,7 +135,30 @@ const removeFromCart = (itemId)=>{
     fetchUser()
   },[])
 
-  const value = {navigate, user, setUser, setIsSeller, isSeller,showUserLogin,setShowUserLogin,products,currency,addToCart,updateCartItem,removeFromCart,cartItems,searchQuery,setSearchQuery,getCartAmount,getCartCount,axios,fetchProducts}
+   useEffect(()=>{
+      const updateCart = async ()=>{
+         try {
+           const { data } = await axios.post('/api/cart/update', {cartItems})
+           if (!data.success){
+           toast.error(data.message)
+
+           } 
+          }catch (error) {
+            toast.error(error.message)
+
+           }
+      }
+
+        if(user && Object.keys(cartItems).length > 0){
+         updateCart()
+        }},[cartItems,user])
+      
+
+
+
+
+
+  const value = {navigate,user, setUser, setIsSeller, isSeller,showUserLogin,setShowUserLogin,products,currency,addToCart,updateCartItem,removeFromCart,cartItems,searchQuery,setSearchQuery,getCartAmount,getCartCount,axios,fetchProducts}
 
   return <AppContext.Provider value={value}>
        {children}
