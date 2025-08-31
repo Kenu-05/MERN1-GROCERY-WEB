@@ -67,7 +67,25 @@ const Cart = () => {
             }else{
                 toast.error(data.message)
             }
+        }else{
+
+        // Place Order with Stripe
+           
+             const {data} = await axios.post('/api/order/stripe', {
+                 userId: user ._id,
+                 items:CartArray.map(item=> ({product:item._id, quantity:item.quantity})),
+                 address: selectedAddress ._id
+            })
+
+            if(data.success){
+               window.location.replace(data.url)
+            }else{
+                toast.error(data.message)
+            }
         }
+        
+
+
      }catch(error){
           toast.error(error.message)
      } 
