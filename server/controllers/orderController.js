@@ -35,7 +35,7 @@ catch (error) {
      // Get Orders by User ID : /api/order/user
      export const getUserOrders = async (req, res)=>{
          try {
-          const { userId } = req.body;
+         const userId = req.user.userId;
           const orders = await Order.find({
                  userId,
                  $or: [{paymentType: "COD"}, {isPaid: true}]
