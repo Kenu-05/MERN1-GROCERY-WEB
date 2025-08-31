@@ -4,10 +4,10 @@ import { assets, dummyAddress } from "../assets/assets";
 
 const Cart = () => {
 
-    const {products,currency,cartItems,removeFromCart,getCartCount,updateCartItem,navigate,getCartAmount}=useAppContext()
+    const {products,currency,cartItems,removeFromCart,getCartCount,updateCartItem,navigate,getCartAmount,axios,user}=useAppContext()
     const [CartArray,setCartArray]=useState([])
-    const [addresses,setAddresses]=useState(dummyAddress)
-    const [selectedAddress,setSelectedAddress]=useState(dummyAddress[0])
+    const [addresses,setAddresses]=useState([])
+    const [selectedAddress,setSelectedAddress]=useState(null)
     const [paymentOption,setPaymentOption]=useState("COD")
 
     const [showAddress, setShowAddress] = useState(false)
@@ -21,12 +21,41 @@ const Cart = () => {
         }
         setCartArray(tempArray);
    }
+  const getUserAddress = async ()=>{
+         try { 
+            const {data} = await axios.get('/api/address/get',{params: { userId: user._id }});
+            if (data.success){
+                
+               setAddresses(data.addresses)
+               if(data.addresses.length > 0){
+               setSelectedAddress(data.addresses[0])
+
+               }else{
+               toast.error(data.message)
+               }
+
+           } }
+         catch (error) {
+           toast.error(error.message)}
+         }
+
+
+
+
+
+
+
    const placeOrder=async ()=>{}
 
        useEffect(()=>{
          if(products.length > 0 && cartItems){
              getCart()
            }}, [products, cartItems])
+
+       useEffect(()=>{
+             if(user){
+                getUserAddress()   
+            }},[user])
 
     return products.length > 0 && cartItems?(
 
@@ -87,7 +116,7 @@ const Cart = () => {
                 <div className="mb-6">
                     <p className="text-sm font-medium uppercase">Delivery Address</p>
                     <div className="relative flex justify-between items-start mt-2">
-                        <p className="text-gray-500">{selectedAddress ? `${selectedAddress. street}, ${selectedAddress. city},${selectedAddress.state}, ${selectedAddress. country}` : "No address found"}</p>
+                        <p className="text-gray-500">{selectedAddress ? `${selectedAddress.street}, ${selectedAddress. city},${selectedAddress.state}, ${selectedAddress. country}` : "No address found"}</p>
                         <button onClick={() => setShowAddress(!showAddress)} className="text-primary hover:underline cursor-pointer">
                             Change
                         </button>
@@ -102,7 +131,7 @@ const Cart = () => {
                             {address.street},{address.city},{address.state},{address.country}
                            </p>
                            )) }
-                           <p onClick={() => navigate("/add-adress")}
+                           <p onClick={() => navigate("/add-address")}
                            className="text-primary text-center
                            cursor-pointer p-2 hover:bg-primary/10">
                                Add address
