@@ -63,7 +63,7 @@ const Cart = () => {
             if(data.success){
                toast. success(data.message)
                setCartItems({})
-               navigate('/my-orders')
+               navigate("/loader?next=/my-orders")
             }else{
                 toast.error(data.message)
             }
