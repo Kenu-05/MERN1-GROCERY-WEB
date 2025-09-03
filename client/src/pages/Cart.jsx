@@ -9,7 +9,7 @@ const Cart = () => {
     const [CartArray,setCartArray]=useState([])
     const [addresses,setAddresses]=useState([])
     const [selectedAddress,setSelectedAddress]=useState(null)
-    const [paymentOption,setPaymentOption]=useState("COD")
+    const [paymentOption,setPaymentOption]=useState("")
 
     const [showAddress, setShowAddress] = useState(false)
 
@@ -67,14 +67,14 @@ const Cart = () => {
             }else{
                 toast.error(data.message)
             }
-        }else{
+        } else{
 
         // Place Order with Stripe
            
              const {data} = await axios.post('/api/order/stripe', {
                  userId: user ._id,
                  items:CartArray.map(item=> ({product:item._id, quantity:item.quantity})),
-                 address: selectedAddress ._id
+                 address: selectedAddress._id
             })
 
             if(data.success){
