@@ -1,6 +1,8 @@
 import express from 'express';
 import { isSellerAuth, sellerLogin,sellerLogout } from '../controllers/sellerController.js';
 import authSeller from '../middlewares/authSeller.js';
+// import {checkJwt } from "./middlewares/auth0.js";
+
 
 const sellerRouter = express.Router();
 

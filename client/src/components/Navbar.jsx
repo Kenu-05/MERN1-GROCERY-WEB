@@ -3,20 +3,32 @@ import { NavLink } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import { useAppContext } from '../context/AppContext'
 import { toast } from 'react-hot-toast';
+import { useAuth0 } from '@auth0/auth0-react'
 
 const Navbar = () => {
     const [open, setOpen] = React.useState(false)
     const {user,setUser,setShowUserLogin,navigate,searchQuery,setSearchQuery,getCartCount,axios}=useAppContext();
+    const { user:auth0User,isAuthenticated,logout:auth0Logout } = useAuth0()
 
     const logout=async ()=>{
+
        try {
-          const { data } = await axios.get('/api/user/logout')
-          if(data.success){
-            toast.success(data.message)
-            setUser(null);
-            navigate('/')
-           }else{
-              toast.error(data.message)}
+           if (isAuthenticated) {
+        // Auth0 user → use Auth0 logout
+        auth0Logout({ returnTo: window.location.origin });
+        setUser(null);
+        toast.success("Logged out from Auth0");
+            } else {
+        // Manual login → clear backend cookie
+        const { data } = await axios.get("/api/user/logout");
+        if (data.success) {
+          toast.success(data.message);
+          setUser(null);
+          navigate("/");
+        } else {
+          toast.error(data.message);
+        }
+      }
 
       } catch (error) {
           toast.error(error.message)
@@ -29,6 +41,17 @@ const Navbar = () => {
             navigate("/products")
         }
     },[searchQuery])
+    
+    useEffect(() => {
+    if (isAuthenticated && auth0User && !user) {
+      // Map Auth0 user info to your app's user state
+      setUser({
+        name: auth0User.name,
+        email: auth0User.email,
+        auth0Id: auth0User.sub,
+      });
+    }
+  }, [isAuthenticated, auth0User]);
     
 
   return (

@@ -8,7 +8,8 @@ import User from "../models/User.js"
 export const placeOrderStripe = async (req, res)=>{
    try {
     const origin=req.get('origin')
-     const { userId, items, address } = req.body;
+      const{ userId, auth0Id } = req.user || {};
+     const {  items, address } = req.body;
      if(!address || items.length === 0){
          return res. json({success: false, message: "Invalid data"})
        }
@@ -27,10 +28,12 @@ export const placeOrderStripe = async (req, res)=>{
 
        const order=await Order.create({
               userId,
+              auth0Id,
               items,
               amount,
               address,
               paymentType: "Online",
+              isPaid: false,
        });
 
        // Stripe Gateway Initialize
@@ -59,11 +62,12 @@ export const placeOrderStripe = async (req, res)=>{
           cancel_url:`${origin}/cart` ,
           metadata:{
           orderId: order._id.toString(),
-          userId,
+          userId: userId ? userId.toString() : "",
+          auth0Id: auth0Id || "",
           }
        })  
 
-
+       console.log(session.metadata)
        return res.json({success:true,url:session.url})
 
 } 
@@ -88,46 +92,45 @@ export const stripeWebhooks = async (request, response)=>{
            process.env.STRIPE_WEBHOOK_SECRET);
 
        } catch (error) {
+         console.log("Webhook error:", err.message);
          response.status(400).send( `Webhook Error: ${error.message}` )
        }
 
        // Handle the event
        switch (event.type) {
-         case "payment_intent. succeeded": {
-           const paymentIntent = event.data.object;
-           const paymentIntentId = paymentIntent.id;
+    case "checkout.session.completed":
+      const session = event.data.object;
+      const { orderId, userId, auth0Id } = session.metadata;
 
-           // Getting Session Metadata
-           const session = await stripeInstance.checkout.sessions.list({
-                payment_intent:paymentIntentId,
-            });
-
-          const { orderId, userId } = session.data[0].metadata;
-          // Mark Payment as Paid
-          await Order.findByIdAndUpdate(orderId, {isPaid: true})
-          // Clear user cart
-          await User.findByIdAndUpdate(userId, {cartItems:{}});
-          break;
-
-
-         }
-         case "payment_intent.payment_failed": {
-           const paymentIntent = event.data.object;
-           const paymentIntentId = paymentIntent.id;
-
-           // Getting Session Metadata
-           const session = await stripeInstance.checkout.sessions.list({
-                payment_intent:paymentIntentId,
-            });
-
-          const { orderId } = session.data[0].metadata;
-          await Order.findByIdAndDelete(orderId);
-          break;
+      // Mark order as paid
+      if (orderId) {
+        await Order.findByIdAndUpdate(orderId, { isPaid:true });
       }
-      default:
-         console.error(`Unhandled event type${event.type})`)
-         break;
-   }
+
+      // Clear cart
+      if (userId) {
+        await User.findByIdAndUpdate(userId, { $set: { cartItems: [] } });
+       
+      } else if (auth0Id) {
+        await User.findOneAndUpdate({ auth0Id }, { $set: { cartItems: [] } });
+       
+      }
+      console.log("Payment successful and cart cleared for user:", userId || auth0Id);
+      break;
+
+    case "checkout.session.expired":
+      // Optionally delete unpaid orders
+      const expiredSession = event.data.object;
+      const expiredOrderId = expiredSession.metadata.orderId;
+      if (expiredOrderId) {
+        await Order.findByIdAndDelete(expiredOrderId);
+      }
+      break;
+
+    default:
+      console.warn(`Unhandled event type ${event.type}`);
+  }
+
    response.json({recieved:true});
 }
 
@@ -137,7 +140,11 @@ export const stripeWebhooks = async (request, response)=>{
 // Place Order COD : /api/order/cod
 export const placeOrderCOD = async (req, res)=>{
    try {
-     const { userId, items, address } = req.body;
+     const { items, address } = req.body;
+     const{ userId, auth0Id } = req.user || {};
+     if (!userId && !auth0Id) {
+      return res.status(401).json({ success: false, message: "User not authorized" });
+    }
      if(!address || items.length === 0){
          return res. json({success: false, message: "Invalid data"})
        }
@@ -151,11 +158,18 @@ export const placeOrderCOD = async (req, res)=>{
 
        await Order.create({
               userId,
+              auth0Id,
               items,
               amount,
               address,
               paymentType: "COD",
        });
+       if (userId) {
+      await User.findByIdAndUpdate(userId, { cartItems: [] });
+    }
+    if (auth0Id) {
+      await User.findOneAndUpdate({ auth0Id }, { cartItems: [] });
+    }
 
        return res.json({success:true,message:"Order Placed Successfullly"})
 

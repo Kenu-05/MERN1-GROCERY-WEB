@@ -2,6 +2,7 @@ import { useState,useEffect } from "react";
 import { useAppContext } from "../context/AppContext";
 import { assets, dummyAddress } from "../assets/assets";
 import toast from "react-hot-toast";
+import { useSearchParams } from "react-router-dom";
 
 const Cart = () => {
 
@@ -9,7 +10,8 @@ const Cart = () => {
     const [CartArray,setCartArray]=useState([])
     const [addresses,setAddresses]=useState([])
     const [selectedAddress,setSelectedAddress]=useState(null)
-    const [paymentOption,setPaymentOption]=useState("")
+    const [paymentOption,setPaymentOption]=useState("COD")
+    const [searchParams] = useSearchParams();
 
     const [showAddress, setShowAddress] = useState(false)
 
@@ -78,7 +80,10 @@ const Cart = () => {
             })
 
             if(data.success){
+                 
                window.location.replace(data.url)
+               
+                
             }else{
                 toast.error(data.message)
             }
@@ -92,7 +97,11 @@ const Cart = () => {
 
    }
 
-
+     useEffect(() => {
+      if (searchParams.get("next") === "my-orders") {
+       setCartItems({});  // Clear frontend cart state
+       }
+      }, []);
 
 
 

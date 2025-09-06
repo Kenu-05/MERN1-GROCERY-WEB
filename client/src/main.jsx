@@ -4,11 +4,25 @@ import './index.css'
 import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import { AppContextProvider } from './context/AppContext.jsx'
+import { Auth0Provider } from '@auth0/auth0-react'
 
 createRoot(document.getElementById('root')).render(
+  <StrictMode>
   <BrowserRouter>
-  <AppContextProvider>
-    <App />
-    </AppContextProvider>
-  </BrowserRouter>,
+      <Auth0Provider
+        domain={import.meta.env.VITE_AUTH0_DOMAIN}
+        clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
+        authorizationParams={{
+          redirect_uri: window.location.origin,
+          audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+        }}
+        useRefreshTokens={true}       // optional but recommended
+        cacheLocation="localstorage"  // optional
+      >
+        <AppContextProvider>
+          <App />
+        </AppContextProvider>
+      </Auth0Provider>
+    </BrowserRouter>
+  </StrictMode>,
 )
