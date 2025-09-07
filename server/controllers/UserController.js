@@ -80,10 +80,21 @@ export const register = async (req, res)=>{
              
            try {
              
-              const  userId= req.user.userId;
-              const user = await User.findById(userId) .select("-password")
-              return res.json({success:true,user})
-              
+               let user;
+
+              if (req.user?.userId) {
+              // Manual login
+              user = await User.findById(req.user.userId).select("-password");
+              } else if (req.user?.auth0Id) {
+              // OAuth login
+               user = await User.findOne({ auth0Id: req.user.auth0Id }).select("-password");
+           }
+
+              if (!user) {
+               return res.status(401).json({ success: false, message: "User not found" });
+               }
+
+              return res.json({ success: true, user });
 
             } 
             catch (error) {

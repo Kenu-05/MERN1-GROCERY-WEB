@@ -16,8 +16,7 @@ createRoot(document.getElementById('root')).render(
           redirect_uri: window.location.origin,
           audience: import.meta.env.VITE_AUTH0_AUDIENCE,
         }}
-        useRefreshTokens={true}       // optional but recommended
-        cacheLocation="localstorage"  // optional
+        
       >
         <AppContextProvider>
           <App />

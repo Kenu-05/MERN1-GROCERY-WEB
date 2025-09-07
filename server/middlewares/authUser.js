@@ -31,7 +31,7 @@ const verifyAuth0Token = async (token) => {
   const authUser = async (req, res, next)=>{
   try{
   const authHeader = req.headers.authorization;
-  const bearerToken = authHeader && authHeader.startsWith("Bearer ")
+  const bearerToken = authHeader && authHeader.startsWith("Bearer")
     ? authHeader.split(" ")[1]
     : null;
 
